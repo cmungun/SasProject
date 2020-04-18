@@ -65,11 +65,4 @@ run;
 
 
 
-/*
-References
-https://github.com/datasets/covid-19
-https://gist.github.com/cjdinger/2950c1a62acd7f50c33473c311b0d9fe
-https://github.com/NajiElKotob/COVID-19
 
-
-*/
