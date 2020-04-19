@@ -25,17 +25,56 @@ Set probly
 (where=
 	(
 		'Country/Region'n = 'Canada' 
-	and
-		('Province/State'n ='Q'
-    or	'Province/State'n ='Q'
-		)
+
 	)
 );
 Run;
 Data libraryy.dataset;
 Set libraryy.dataset;
  Zero = 0;
+  logConfirmed = log(Confirmed);
  run;
+
+
+ Data QuebecConfirmed;
+Set libraryy.dataset(where=
+	(
+		'Country/Region'n = 'Canada' 
+		and
+	('Province/State'n ='Q'
+		)
+	)
+	);
+ Zero = 0;
+ logConfirmed = log(Confirmed);
+ 
+ run;
+
+
+proc sgplot data=QuebecConfirmed;
+  refline 1 1.5 2 / lineattrs=graphgridlines;
+  highlow x=Date high=Confirmed low=Zero / type=bar  
+  group='Province/State'n 
+  groupdisplay=cluster lineattrs=(color=black);
+  xaxis discreteorder=data display=(nolabel);
+  yaxis label='Value (/ULN)' offsetmin=0;;
+  run;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 title 'Corona Cases in Quebec';
 footnote j=l 'Bar Chart on Discrete Axis';
@@ -65,7 +104,7 @@ run;
 
 /*All cases in Canada confirmed cases*/
 
-title 'Corona Cases in Quebec';
+title 'Corona Cases in Canadas provinces';
 footnote j=l 'Bar Chart on Discrete Axis';
 
 ods graphics on /  /*Chart characteristics*/
@@ -89,3 +128,23 @@ run;
 
 
 
+title 'Corona Cases in Canadas provinces in log';
+footnote j=l 'Bar Chart on Dicrete Axis';
+
+ods graphics on /  /*Chart characteristics*/
+      width=10 in
+	  height=10 in
+      outputfmt=gif
+      imagemap=on
+     imagename="MyBoxplot"
+ ;
+ * border=off;
+
+
+PROC SGPLOT data=libraryy.dataset;
+ SERIES X = Date Y = logConfirmed / LEGENDLABEL = 'Quebec' 
+ group='Province/State'n 
+  LINEATTRS = (THICKNESS = 2);
+XAXIS TYPE = TIME;
+
+run;
