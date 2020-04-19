@@ -63,6 +63,29 @@ var Date 'Province/State'n Confirmed;
 run;
 
 
+/*All cases in Canada confirmed cases*/
+
+title 'Corona Cases in Quebec';
+footnote j=l 'Bar Chart on Discrete Axis';
+
+ods graphics on /  /*Chart characteristics*/
+      width=10 in
+	  height=10 in
+      outputfmt=gif
+      imagemap=on
+     imagename="MyBoxplot"
+ ;
+ * border=off;
+
+
+PROC SGPLOT data=libraryy.dataset;
+ SERIES X = Date Y = Confirmed / LEGENDLABEL = 'Quebec' 
+ group='Province/State'n 
+ LINEATTRS = (THICKNESS = 2);
+XAXIS TYPE = TIME;
+
+run;
+
 
 
 
