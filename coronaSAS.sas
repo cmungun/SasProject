@@ -148,3 +148,99 @@ PROC SGPLOT data=libraryy.dataset;
 XAXIS TYPE = TIME;
 
 run;
+
+
+
+
+
+
+/*First cases of corona around the world first observed*/
+
+proc sort data=probly out=sorted;
+/*  by country;*/
+/* by province;*/
+/*   by descending date_confirmation ;*/
+where 
+ Confirmed=1;
+by  Date;
+/*/*by 'Country/Region'n;*/*/
+by 'Province/State'n;
+
+run;
+
+
+
+proc sql;
+create table want as
+select a.*
+from sorted a, (select 'Country/Region'n,'Province/State'n,Confirmed as _regimen  from sorted group by 'Province/State'n having date=max(date)) b 
+where a.'Province/State'n = b.'Province/State'n
+group by a.'Country/Region'n ,a.'Province/State'n
+/*,Confirmed,_regimen */
+having date=min(date) 
+and _regimen=Confirmed;
+;
+
+quit;
+
+
+PROC SGPLOT Data = want;
+    scatter x = Date   y = 'Country/Region'n;
+	refline 'Country/Region'n /axis= y;
+	refline Date /axis= x;
+/*	group= 'Country/Region'n, 'Province/State'n */
+/*	groupdisplay=cluster lineattrs=(color=black);*/
+    title "First Case in various Countrues";
+run;
+
+
+
+/*First case in quebec only*/
+
+
+proc sort data=probly out=sorted;
+/*  by country;*/
+/* by province;*/
+/*   by descending date_confirmation ;*/
+where 
+'Country/Region'n ='Canada' and 
+ Confirmed=1;
+by  Date;
+/*/*by 'Country/Region'n;*/*/
+by 'Province/State'n;
+
+
+proc sql;
+create table wantQc as
+select a.*
+from sorted a, (select 'Country/Region'n,'Province/State'n,Confirmed as _regimen  from sorted group by 'Province/State'n having date=max(date)) b 
+where a.'Province/State'n = b.'Province/State'n
+group by a.'Country/Region'n ,a.'Province/State'n
+/*,Confirmed,_regimen */
+having date=min(date) 
+and _regimen=Confirmed;
+;
+
+quit;
+
+
+PROC SGPLOT Data = wantQc;
+    scatter x = Date   y = 'Province/State'n;
+	refline 'Province/State'n /axis= y;
+	refline Date /axis= x;
+/*	group= 'Country/Region'n, 'Province/State'n */
+/*	groupdisplay=cluster lineattrs=(color=black);*/
+    title "First Case in Canada Provinces";
+run;
+
+
+
+
+
+
+
+
+
+
+
+
