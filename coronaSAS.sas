@@ -236,6 +236,114 @@ run;
 
 
 
+/*Merging the population dataset with our corona dataset -> kindly note there is a loss of info through the left join*/
+
+
+
+proc import datafile="F:\school\BSTA445\population\data\population.csv"
+out=mydata dbms=csv replace; 
+run;
+proc sort data=mydata out=sortedPop2;
+/*  by country;*/
+/* by province;*/
+/*   by descending date_confirmation ;*/
+
+by 'Country Name'n;
+
+/*/*by 'Country/Region'n;*/*/;
+
+run;
+
+
+
+
+PROC SQL;
+CREATE TABLE C AS
+select *
+
+FROM  totalby as A left JOIN  sortedPop2 as B
+
+ON A.'Country/Region'n =B.'Country Name'n
+where 
+B.Year=2018
+/*and */
+/*B.'Country Name'n is null*/
+;
+QUIT;
+
+
+
+Data wantDeaths10;
+Set C;
+Zero=0;
+if (Value > 0) then do;
+   MortalityRate = (TDeaths/Value)*100;
+  end;
+  label MortalityRate = "Contamination percentage";
+/* by Deaths;*/
+ run;
+proc sort data=wantDeaths10(DROP=Deaths Recovered Confirmed ) out=wantDeaths10sorted;
+   by descending MortalityRate;
+run;
+
+
+data we;
+ set wantDeaths10sorted(obs=30);
+ run;
+
+PROC SGPLOT Data = we;
+ refline 1 1.5 2 / lineattrs=graphgridlines;
+  highlow x='Country/Region'n   high=MortalityRate low=Zero / type=bar  
+  group='Country/Region'n 
+  groupdisplay=cluster lineattrs=(color=black);
+  xaxis discreteorder=data display=(nolabel);
+  yaxis label='Value (/ULN)' offsetmin=0;;
+    title "Top 30 Deaths per Capita";
+run;
+
+
+
+
+Data wantDeaths10;
+Set C;
+Zero=0;
+if (Value > 0) then do;
+   MortalityRate = (TConfirmed/Value)*100;
+  end;
+  label MortalityRate = "Contamination percentage";
+/* by Deaths;*/
+ run;
+proc sort data=wantDeaths10(DROP=Deaths Recovered Confirmed ) out=wantDeaths10sorted;
+   by descending MortalityRate;
+run;
+
+
+data we;
+ set wantDeaths10sorted(obs=30);
+ run;
+
+PROC SGPLOT Data = we;
+ refline 1 1.5 2 / lineattrs=graphgridlines;
+  highlow x='Country/Region'n   high=MortalityRate low=Zero / type=bar  
+  group='Country/Region'n 
+  groupdisplay=cluster lineattrs=(color=black);
+  xaxis discreteorder=data display=(nolabel);
+  yaxis label='Value (/ULN)' offsetmin=0;;
+    title "Top 30 Confirmed Cases per Capita";
+run;
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
 
 
